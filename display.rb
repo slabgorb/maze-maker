@@ -3,19 +3,36 @@ require 'rubygems'
 require 'RMagick'
 
 class Display
-  def initialize(size, background, unit = 10, output = out.gif)
+  include Magick
+  def initialize(size, background, unit = 10, output = 'out.gif')
     @canvas = Magick::Image.new(size.first * unit,
                                 size.last * unit,
+                                fill_color, fill_lines_color,
                                 background)
     @gc = Draw.new
-    @gc.stroke('black')
+    @gc.stroke(fill_lines_color)
     @gc.stroke_width(2)
-    @gc.fill('black')
-    @unit = unit;
+    @gc.fill(fill_color)
+    @unit = unit
+    @output = File.expand_path(output)
   end
 
   def square pos
-    @gc.polygon(pos.first, pos.last, pos.first + unit, pos.last + unit)
+    x = pos.first * @unit
+    y =  pos.last * @unit
+    @gc.polyline(x,y,
+                x + @unit, y,
+                x + @unit, y + @unit,
+                x, y + @unit,
+                 x,y)
+  end
+
+  def color grid
+    grid.length.times do |x|
+      grid.first.length.times do |y|
+        square [x,y] if grid[x][y] == 1
+      end
+    end
   end
 
   def save
