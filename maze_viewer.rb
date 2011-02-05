@@ -26,6 +26,7 @@ def parse(args)
   options.algorithm  = 'prim'
   options.complexity = 0.1
   options.density    = 0.05
+  options.seed       = nil
   opts = OptionParser.new do |opts|
     opts.banner = "usage: maze_viewer.rb [options]"
     opts.separator ""
@@ -33,6 +34,10 @@ def parse(args)
     opts.on("-a", "--algorithm TYPE",
             "Choose the type of maze generator (default: Prim)") do |alg|
       options.algorithm = alg
+    end
+    opts.on("-a", "--seed TYPE",
+            "Set random seed") do |seed|
+      options.seed = seed.to_f
     end
     opts.on("-c", "--complexity COMPLEXITY",
             "Complexity of maze") do |complexity|
@@ -83,6 +88,8 @@ def parse(args)
 end
 
 options = parse(ARGV)
+
+srand(options.seed) if options.seed
 
 case options.algorithm
   when 'Depthfirst'

@@ -4,10 +4,9 @@ require 'RMagick'
 
 class Display
   include Magick
-  def initialize(size, background, unit = 10, output = 'out.gif')
+  def initialize(size, background, fill_color, fill_lines_color, unit = 10, output = 'out.gif')
     @canvas = Magick::Image.new(size.first * unit,
                                 size.last * unit,
-                                fill_color, fill_lines_color,
                                 background)
     @gc = Draw.new
     @gc.stroke(fill_lines_color)
@@ -23,6 +22,15 @@ class Display
     @gc.polyline(x,y,
                 x + @unit, y,
                 x + @unit, y + @unit,
+                x, y + @unit,
+                 x,y)
+  end
+
+  def corner pos
+    x = pos.first * @unit
+    y =  pos.last * @unit
+     @gc.polyline(x,y,
+                x + @unit, y,
                 x, y + @unit,
                  x,y)
   end
