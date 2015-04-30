@@ -1,4 +1,0 @@
-
-class Encounter
-end
-

@@ -1,11 +1,6 @@
 #!/usr/bin/env ruby
-
-require './maze'
-require './display'
-require './depthfirst'
-require './prim'
-require './cellular'
 require 'RMagick'
+require_relative '../lib/maze_maker.rb'
 require 'optparse'
 require 'ostruct'
 require 'pp'
@@ -248,23 +243,26 @@ options = parse(ARGV)
 
 srand(options.seed) if options.seed
 
-class MazeFactory
-  def self.maze(type, size, complexity, density)
-    case type
-    when 'depthfirst'
-      maze = DepthFirst.new(size)
-    when 'cellular'
-      maze = Cellular.new(size, density)
-    else
-      maze = Prim.new(size,
-                      complexity,
-                      density)
-     return maze
+module MazeMaker
+  class MazeFactory
+    def self.maze(type, size, complexity, density)
+      case type
+      when 'depthfirst'
+        maze = DepthFirst.new(size)
+      when 'cellular'
+        maze = Cellular.new(size, density)
+      else
+        maze = Prim.new(size,
+                        complexity,
+                        density)
+        return maze
+      end
     end
   end
 end
 
-maze = MazeFactory::maze(options.algorithm, [options.width, options.height],
+
+maze = MazeMaker::MazeFactory::maze(options.algorithm, [options.width, options.height],
                          options.complexity, options.density)
 
 
@@ -276,7 +274,7 @@ i = Magick::ImageList.new('patterns/fills.psd')
 
 background = Magick::TextureFill.new(i[3])
 
-display = Display.new( [options.width, options.height],
+display = MazeMaker::Display.new( [options.width, options.height],
                        background,
                        options.fill,
                        options.fill_line,
@@ -287,5 +285,4 @@ maze.generate
 maze.find_points
 display.color maze
 display.save
-
-puts maze.count_size [2,19]
+`open #{options.output}`
